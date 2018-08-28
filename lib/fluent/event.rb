@@ -251,19 +251,9 @@ module Fluent
     end
 
     def each(&block)
-      if @unpacked_times
-        @unpacked_times.each_with_index do |time, i|
-          block.call(time, @unpacked_records[i])
-        end
-      else
-        @unpacked_times = []
-        @unpacked_records = []
-        msgpack_unpacker.feed_each(@data) do |time, record|
-          @unpacked_times << time
-          @unpacked_records << record
-          block.call(time, record)
-        end
-        @size = @unpacked_times.size
+      ensure_unpacked!
+      @unpacked_times.each_with_index do |time, i|
+        block.call(time, @unpacked_records[i])
       end
       nil
     end
